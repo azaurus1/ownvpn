@@ -34,7 +34,7 @@ func Run(cmd *cobra.Command, args []string) {
 		LinkAttrs: la,
 		Mode:      netlink.TUNTAP_MODE_TUN,
 		Flags:     netlink.TUNTAP_ONE_QUEUE | netlink.TUNTAP_NO_PI,
-		Queues:    1,
+		Queues:    1, // must be set explicitly on the read or the fd will be thrown away at the end
 	}
 
 	if err := netlink.LinkAdd(tun); err != nil {
