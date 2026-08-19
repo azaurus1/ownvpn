@@ -27,6 +27,7 @@ func Up(cmd *cobra.Command, args []string) {
 	tun := &netlink.Tuntap{
 		LinkAttrs: la,
 		Mode:      netlink.TUNTAP_MODE_TUN,
+		Flags:     netlink.TUNTAP_DEFAULTS | netlink.TUNTAP_NO_PI,
 	}
 
 	err := netlink.LinkAdd(tun)

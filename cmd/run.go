@@ -21,22 +21,25 @@ var runCmd = &cobra.Command{
 
 func Run(cmd *cobra.Command, args []string) {
 
-	if len(neighbours) > 0 {
-		fmt.Println("neighbours: ", neighbours)
+	if len(neighbours) < 1 {
+		fmt.Println("neighbours map is required!")
+		return
 	}
 
 	var wg sync.WaitGroup
 
-	attrs := netlink.NewLinkAttrs()
-	attrs.Name = "tun0"
+	la := netlink.NewLinkAttrs()
+	la.Name = "ownvpn0"
 	tun := &netlink.Tuntap{
-		LinkAttrs: attrs,
+		LinkAttrs: la,
 		Mode:      netlink.TUNTAP_MODE_TUN,
-		Queues:    1, // required, or Fds gets closed and thrown away
+		Flags:     netlink.TUNTAP_ONE_QUEUE | netlink.TUNTAP_NO_PI,
+		Queues:    1,
 	}
 
 	if err := netlink.LinkAdd(tun); err != nil {
-		log.Fatalf("failed to attach: %v", err)
+		fmt.Println("error attaching to tun: ", err)
+		return
 	}
 
 	f := tun.Fds[0]
@@ -50,7 +53,7 @@ func Run(cmd *cobra.Command, args []string) {
 				log.Println("error: ", err)
 			}
 
-			// log.Println("buf: ", buf)
+			log.Println("buf: ", buf)
 		}
 
 	})
